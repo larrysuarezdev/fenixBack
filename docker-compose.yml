@@ -1,0 +1,11 @@
+version: '2'
+services:
+    web:
+        image: mauroarias81/mawesi_laravel:php5.6
+        ports:
+            - "8080:8080"
+        volumes:
+            - .:/app
+        working_dir: /app
+        #tty: true
+        command: php artisan serve --host 0.0.0.0 --port 8080
