@@ -1,23 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Lib\LDAP as LDAP;
 use App\User;
-use App\Persona;
-use App\Recomendacione;
 use JWTAuth;
 use Hash as Hash;
-use Carbon\Carbon;
-use DB;
-use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-	public function __construct(LDAP $ldap)
-	{ }
 
 	public function postSignIn(Requests\PostSignInRequest $request)
 	{
@@ -58,6 +48,7 @@ class UserController extends Controller
 		$persona->telefono1 = $input["telefono1"];
 		$persona->telefono2 = $input["telefono2"];
 		$persona->login = $input["login"];
+		$persona->email = $input["email"];
 		$persona->username = $input["username"];
 		$persona->password = $input["password"];
 		
@@ -78,6 +69,7 @@ class UserController extends Controller
 		$persona->telefono1 = $input["telefono1"];
 		$persona->telefono2 = $input["telefono2"];
 		$persona->login = $input["login"];
+		$persona->email = $input["email"];
 		$persona->username = $input["username"];
 		$persona->password = $input["password"];
 

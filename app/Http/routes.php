@@ -16,10 +16,21 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
             Route::put('/', 'UserController@updateUser');
         });
 
-        // Route::group(['prefix' => 'placas'], function() {
-        //     Route::get('/', 'PlacasController@getPlacas');
-        //     Route::post('/files', 'PlacasController@postPlacas');
-        // });
+        Route::group(['prefix' => 'clientes'], function() {
+            Route::get('/', 'ClientesController@getClientes');
+            Route::post('/', 'ClientesController@saveCliente');
+            Route::put('/', 'ClientesController@updateCliente');
+        });
+
+        Route::group(['prefix' => 'parametros'], function() {
+            Route::get('/', 'ParametrosController@getParametros');
+            // Route::post('/', 'ClientesController@saveCliente');
+            // Route::put('/', 'ClientesController@updateCliente');
+        });
+
+        Route::group(['prefix' => 'test'], function() {
+            Route::get('/', 'TestController@getTest');
+        });
 
         // Route::group(['prefix' => 'viajes'], function() {
         //     Route::get('/', 'ViajesController@getViajes');

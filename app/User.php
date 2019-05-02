@@ -20,6 +20,7 @@ class User extends Authenticatable
 		'telefono1',
 		'telefono2',
 		'login',
+		'email',
 		'username',
 		'password'
 	];
