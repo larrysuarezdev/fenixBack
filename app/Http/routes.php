@@ -24,13 +24,19 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
 
         Route::group(['prefix' => 'parametros'], function() {
             Route::get('/', 'ParametrosController@getParametros');
-            // Route::post('/', 'ClientesController@saveCliente');
+            Route::get('/rutas', 'ParametrosController@getRutas');
             // Route::put('/', 'ClientesController@updateCliente');
         });
 
-        Route::group(['prefix' => 'test'], function() {
-            Route::get('/', 'TestController@getTest');
+        Route::group(['prefix' => 'creditos'], function() {
+            Route::get('/{id}', 'CreditosController@getCredito');
+            Route::post('/', 'CreditosController@postCredito');
+            Route::post('/abonos', 'CreditosController@postAbonos');
         });
+
+        // Route::group(['prefix' => 'test'], function() {
+        //     Route::post('/', 'TestController@postCredito');            
+        // });
 
         // Route::group(['prefix' => 'viajes'], function() {
         //     Route::get('/', 'ViajesController@getViajes');

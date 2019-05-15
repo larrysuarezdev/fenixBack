@@ -19,4 +19,20 @@ class ParametrosController extends Controller
         return response()->json(['data' => $parametros]);
     }
 
+    public function getRutas()
+    {
+        $parametros = Parametro::with('parametros_detalles')->where('nombre', 'Rutas')->get();
+
+        $rutas = array();
+        foreach ($parametros as $key => $value) {
+            foreach ($value->parametros_detalles as $key1 => $valueP) {
+                $rutas[] = array(
+                    'value' => $valueP['id_interno'],
+                    'label' => $valueP['valor']
+                );
+            }
+        }
+
+        return response()->json(['data' => $rutas]);
+    }
 }
