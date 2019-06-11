@@ -1,34 +1,9 @@
 <?php
 
-/**
- * Created by Reliese Model.
- * Date: Sat, 04 May 2019 15:59:40 -0500.
- */
-
 namespace App;
 
 use Reliese\Database\Eloquent\Model as Eloquent;
 
-/**
- * Class Credito
- * 
- * @property int $id
- * @property int $orden
- * @property int $cliente_id
- * @property int $ruta_id
- * @property int $mora
- * @property float $cuotas_pagas
- * @property float $valor_prestamo
- * @property float $mod_cuota
- * @property string $mod_dias
- * @property bool $activo
- * @property \Carbon\Carbon $inicio_credito
- * 
- * @property \App\Cliente $cliente
- * @property \Illuminate\Database\Eloquent\Collection $creditos_detalles
- *
- * @package App
- */
 class Credito extends Eloquent
 {
 	public $timestamps = false;
@@ -57,6 +32,7 @@ class Credito extends Eloquent
 		'valor_prestamo',
 		'mod_cuota',
 		'mod_dias',
+		'observaciones',
 		'activo',
 		'inicio_credito'
 	];
@@ -71,12 +47,26 @@ class Credito extends Eloquent
 		return $this->hasMany(\App\CreditosDetalle::class);
 	}
 
+	public function creditos_renovaciones()
+	{
+		return $this->hasMany(\App\CreditosRenovacione::class);
+	}
+
 	public static function getCreditos($id)
 	{
-		$creditos = Credito::with('cliente')->with('creditos_detalles')
+		$creditos = Credito::with('cliente')->with('creditos_renovaciones')->with('creditos_detalles.user')
 					->where([['ruta_id', $id], ['activo', true]])->orderBy('orden', 'ASC')
 					->get();
 					
 		return $creditos;
+	}
+
+	public static function CreditoUsuarioActivo($id){
+		$res = false;
+		$creditos = Credito::where([['cliente_id', $id], ['activo', true]])->get();
+		if(count($creditos) > 0)
+			$res = true;
+			
+		return $res;
 	}
 }

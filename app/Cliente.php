@@ -55,13 +55,13 @@ class Cliente extends Eloquent
 		'tel_fiador'
 	];
 
+	public function clientes_referencias()
+	{
+		return $this->hasMany(\App\ClientesReferencia::class);
+	}
+
 	public function creditos()
 	{
 		return $this->hasMany(\App\Credito::class);
-	}
-
-	public function creditos_detalles()
-	{
-		return $this->hasMany(\App\CreditosDetalle::class);
 	}
 }

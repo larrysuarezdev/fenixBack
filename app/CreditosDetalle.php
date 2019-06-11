@@ -42,13 +42,13 @@ class CreditosDetalle extends Eloquent
 		'fecha_abono'
 	];
 
-	public function cliente()
-	{
-		return $this->belongsTo(\App\Cliente::class);
-	}
-
 	public function credito()
 	{
 		return $this->belongsTo(\App\Credito::class);
+	}
+
+	public function user()
+	{
+		return $this->belongsTo(\App\User::class, 'usuario_id');
 	}
 }

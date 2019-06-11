@@ -29,6 +29,7 @@ class ClienteRequest extends Request
             'dir_fiador' => 'required',
             'barrio_fiador' => 'required',
             'tel_fiador' => 'required',
+            'clientes_referencias' => ''
         ];
     }
 }

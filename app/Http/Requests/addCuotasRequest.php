@@ -25,7 +25,8 @@ class addCuotasRequest extends Request
     {
         return [
             'cuotas' => 'required',
-            'idRuta' => 'required'
+            'idRuta' => 'required',
+            'flujoCaja' => 'required'
         ];
     }
 }

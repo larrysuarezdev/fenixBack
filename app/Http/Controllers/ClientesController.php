@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Cliente;
+use App\ClientesReferencia;
 use JWTAuth;
 
 class ClientesController extends Controller
@@ -11,7 +12,7 @@ class ClientesController extends Controller
     public function getClientes()
     {
         $user = JWTAuth::parseToken()->authenticate();
-        $clientes = Cliente::get();
+        $clientes = Cliente::with('clientes_referencias')->with('creditos')->get();
 
         return response()->json(['data' => $clientes]);
     }
@@ -38,18 +39,18 @@ class ClientesController extends Controller
         $cliente->tel_fiador = $input["tel_fiador"];
 
         $cliente->save();
-        $clientes = Cliente::get();
+        $clientes = Cliente::with('clientes_referencias')->with('creditos')->get();
 
         return response()->json(['data' => $clientes]);
     }
 
     public function updateCliente(Requests\ClienteRequest $request)
-	{
-		$input = $request->all();
+    {
+        $input = $request->all();
 
         $cliente = Cliente::find($input["id"]);
-        		
-		$cliente->titular = $input["titular"];
+
+        $cliente->titular = $input["titular"];
         $cliente->cc_titular = $input["cc_titular"];
         $cliente->fiador = $input["fiador"];
         $cliente->cc_fiador = $input["cc_fiador"];
@@ -65,9 +66,28 @@ class ClientesController extends Controller
         $cliente->barrio_fiador = $input["barrio_fiador"];
         $cliente->tel_fiador = $input["tel_fiador"];
 
-		$cliente->save();
-		$clientes = Cliente::get();
+        foreach ($input["clientes_referencias"] as $key => $value) {
+            // error_log($value['tipo_referencia']);
+            $clienteRef = new ClientesReferencia;
+            if (isset($value['new'])) {
 
-		return response()->json(['data' => $clientes]);
-	}
+                if (!$value['new']) {
+                    $clienteRef = ClientesReferencia::find($value["id"]);
+                }
+
+                $clienteRef->cliente_id = $cliente->id;
+                $clienteRef->nombre = $value['nombre'];
+                $clienteRef->direccion = $value['direccion'];
+                $clienteRef->barrio = $value['barrio'];
+                $clienteRef->tipo_referencia = $value['tipo_referencia'];
+                $clienteRef->telefono = $value['telefono'];
+                $clienteRef->save();
+            }
+        }
+
+        $cliente->save();
+        $clientes = Cliente::with('clientes_referencias')->with('creditos')->get();
+
+        return response()->json(['data' => $clientes]);
+    }
 }

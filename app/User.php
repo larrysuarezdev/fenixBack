@@ -24,4 +24,9 @@ class User extends Authenticatable
 		'username',
 		'password'
 	];
+
+	public function creditos_detalles()
+	{
+		return $this->hasMany(\App\CreditosDetalle::class, 'usuario_id');
+	}
 }

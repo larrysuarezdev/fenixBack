@@ -20,7 +20,7 @@ class CORS
             'Access-Control-Allow-Methods'=> 'POST, GET, OPTIONS, PUT, DELETE',
             'Access-Control-Allow-Headers'=> 'Content-Type, X-Auth-Token, Origin'
         ];
-        error_log($request->getMethod());
+        // error_log($request->getMethod());
         if($request->getMethod() == "OPTIONS") {
             return Response::make('OK', 200, $headers);
         }

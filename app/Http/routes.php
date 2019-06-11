@@ -9,7 +9,12 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
         Route::post('signin', 'UserController@postSignIn');
     });
 
-    Route::group(['middleware' => 'jwt.auth'], function () {    
+    Route::group(['middleware' => 'jwt.auth'], function () {  
+        
+        Route::group(['prefix' => 'dashboard'], function() {
+            Route::get('/newclientes', 'DashboardController@getNewClientes');            
+        });
+
         Route::group(['prefix' => 'usuarios'], function() {
             Route::get('/', 'UserController@getUsers');
             Route::post('/', 'UserController@saveUser');
@@ -32,12 +37,16 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
             Route::get('/{id}', 'CreditosController@getCredito');
             Route::post('/', 'CreditosController@postCredito');
             Route::post('/abonos', 'CreditosController@postAbonos');
+            Route::post('/renovaciones', 'CreditosController@postRenovaciones');
         });
 
-        // Route::group(['prefix' => 'test'], function() {
-        //     Route::post('/', 'TestController@postCredito');            
-        // });
+        Route::group(['prefix' => 'flujoCaja'], function() {
+            Route::get('/', 'FlujoCajaController@getFlujoCaja');
+            // Route::post('/', 'FlujoCajaController@postSaveRutas');
+            // Route::put('/estado/{id}', 'FlujoCajaController@putEstadoRutas');
+        });
 
+        
         // Route::group(['prefix' => 'viajes'], function() {
         //     Route::get('/', 'ViajesController@getViajes');
         //     Route::get('/all', 'ViajesController@getAllViajesToUser');
@@ -53,11 +62,7 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
         //     Route::put('/solicitudviajes', 'ViajesController@putSolicitudViajes');
         // });
 
-        // Route::group(['prefix' => 'rutas'], function() {
-        //     Route::get('/', 'RutasController@getRutas');
-        //     Route::post('/', 'RutasController@postSaveRutas');
-        //     Route::put('/estado/{id}', 'RutasController@putEstadoRutas');
-        // });
+        
 
         // Route::group(['prefix' => 'devices'], function () {
         //     Route::post('/', 'DevicesController@postSaveDevices');
