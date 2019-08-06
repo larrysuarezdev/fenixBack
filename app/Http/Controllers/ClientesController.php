@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Cliente;
+use App\Credito;
 use App\ClientesReferencia;
 use JWTAuth;
 
@@ -11,9 +12,7 @@ class ClientesController extends Controller
 {
     public function getClientes()
     {
-        $user = JWTAuth::parseToken()->authenticate();
         $clientes = Cliente::with('clientes_referencias')->with('creditos')->get();
-
         return response()->json(['data' => $clientes]);
     }
 
@@ -88,6 +87,20 @@ class ClientesController extends Controller
         $cliente->save();
         $clientes = Cliente::with('clientes_referencias')->with('creditos')->get();
 
+        return response()->json(['data' => $clientes]);
+    }
+
+    public function changeState($id)
+    {
+        $cliente = Cliente::with('creditos')->find($id);
+        if (!Credito::CreditoUsuarioActivo($cliente->id)) {
+            $cliente->estado = !$cliente->estado;
+            $cliente->save();
+        }else{
+            return response()->json(['Error' => 'El cliente tiene actualmente un crédito activo'], 423);
+        }
+
+        $clientes = Cliente::with('clientes_referencias')->with('creditos')->get();
         return response()->json(['data' => $clientes]);
     }
 }

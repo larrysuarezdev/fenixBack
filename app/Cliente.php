@@ -37,6 +37,10 @@ use Reliese\Database\Eloquent\Model as Eloquent;
  */
 class Cliente extends Eloquent
 {
+	protected $casts = [
+		'estado' => 'bool'
+	];
+
 	protected $fillable = [
 		'titular',
 		'cc_titular',
@@ -52,7 +56,8 @@ class Cliente extends Eloquent
 		'tel_casa',
 		'dir_fiador',
 		'barrio_fiador',
-		'tel_fiador'
+		'tel_fiador',
+		'estado'
 	];
 
 	public function clientes_referencias()

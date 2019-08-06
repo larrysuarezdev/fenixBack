@@ -27,8 +27,9 @@ class CreditosDetalle extends Eloquent
 {
 	protected $casts = [
 		'credito_id' => 'int',
-		'cliente_id' => 'int',
-		'abono' => 'float'
+		'usuario_id' => 'int',
+		'abono' => 'float',
+		'estado' => 'bool'
 	];
 
 	protected $dates = [
@@ -37,9 +38,10 @@ class CreditosDetalle extends Eloquent
 
 	protected $fillable = [
 		'credito_id',
-		'cliente_id',
+		'usuario_id',
 		'abono',
-		'fecha_abono'
+		'fecha_abono',
+		'estado'
 	];
 
 	public function credito()

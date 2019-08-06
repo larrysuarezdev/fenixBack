@@ -24,16 +24,20 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
         Route::group(['prefix' => 'clientes'], function() {
             Route::get('/', 'ClientesController@getClientes');
             Route::post('/', 'ClientesController@saveCliente');
+            Route::post('/{id}', 'ClientesController@changeState');
             Route::put('/', 'ClientesController@updateCliente');
         });
 
         Route::group(['prefix' => 'parametros'], function() {
             Route::get('/', 'ParametrosController@getParametros');
             Route::get('/rutas', 'ParametrosController@getRutas');
-            // Route::put('/', 'ClientesController@updateCliente');
+            Route::get('/periodos', 'ParametrosController@getPeriodos');
+            Route::post('/', 'ParametrosController@postParametros');
+            Route::put('/', 'ParametrosController@putParametros');
         });
 
         Route::group(['prefix' => 'creditos'], function() {
+            Route::get('/clientes', 'CreditosController@getClientes');
             Route::get('/{id}', 'CreditosController@getCredito');
             Route::post('/', 'CreditosController@postCredito');
             Route::post('/abonos', 'CreditosController@postAbonos');
@@ -42,7 +46,7 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
 
         Route::group(['prefix' => 'flujoCaja'], function() {
             Route::get('/', 'FlujoCajaController@getFlujoCaja');
-            // Route::post('/', 'FlujoCajaController@postSaveRutas');
+            Route::post('/', 'FlujoCajaController@postSaveFlujo');
             // Route::put('/estado/{id}', 'FlujoCajaController@putEstadoRutas');
         });
 

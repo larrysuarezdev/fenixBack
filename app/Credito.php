@@ -16,6 +16,7 @@ class Credito extends Eloquent
 		'cuotas_pagas' => 'float',
 		'valor_prestamo' => 'float',
 		'mod_cuota' => 'float',
+		'modalidad' => 'bool',
 		'activo' => 'bool'
 	];
 
@@ -33,6 +34,7 @@ class Credito extends Eloquent
 		'mod_cuota',
 		'mod_dias',
 		'observaciones',
+		'modalidad',
 		'activo',
 		'inicio_credito'
 	];
@@ -54,19 +56,25 @@ class Credito extends Eloquent
 
 	public static function getCreditos($id)
 	{
-		$creditos = Credito::with('cliente')->with('creditos_renovaciones')->with('creditos_detalles.user')
-					->where([['ruta_id', $id], ['activo', true]])->orderBy('orden', 'ASC')
-					->get();
-					
+		$creditos = Credito::with('cliente')
+			->with('creditos_detalles.user')
+			->with(['creditos_detalles' => function ($v) {
+				$v->where('estado', true);
+			}])
+			->with('creditos_renovaciones')
+			->where([['ruta_id', $id], ['activo', true]])->orderBy('orden', 'ASC')
+			->get();
+
 		return $creditos;
 	}
 
-	public static function CreditoUsuarioActivo($id){
+	public static function CreditoUsuarioActivo($id)
+	{
 		$res = false;
 		$creditos = Credito::where([['cliente_id', $id], ['activo', true]])->get();
-		if(count($creditos) > 0)
+		if (count($creditos) > 0)
 			$res = true;
-			
+
 		return $res;
 	}
 }
