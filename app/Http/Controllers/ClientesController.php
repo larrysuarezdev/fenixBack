@@ -80,6 +80,7 @@ class ClientesController extends Controller
                 $clienteRef->barrio = $value['barrio'];
                 $clienteRef->tipo_referencia = $value['tipo_referencia'];
                 $clienteRef->telefono = $value['telefono'];
+                $clienteRef->parentesco = $value['parentesco'];
                 $clienteRef->save();
             }
         }

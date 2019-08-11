@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Http\Requests;
 use App\User;
 use JWTAuth;
@@ -18,7 +19,7 @@ class UserController extends Controller
 		];
 
 		$user = User::where('Username', $credentials['Username'])->first();
-		
+
 		if ($user) {
 			$hashed = Hash::make($credentials['Password']);
 			if (Hash::check($user->password, $hashed)) {
@@ -32,7 +33,7 @@ class UserController extends Controller
 
 	public function getUsers()
 	{
-		$user = JWTAuth::parseToken()->authenticate();        
+		$user = JWTAuth::parseToken()->authenticate();
 		$personas = User::get();
 
 		return response()->json(['data' => $personas]);
@@ -51,7 +52,8 @@ class UserController extends Controller
 		$persona->email = $input["email"];
 		$persona->username = $input["username"];
 		$persona->password = $input["password"];
-		
+		$persona->ruta = $input["ruta"];
+
 		$persona->save();
 		$personas = User::get();
 
@@ -63,21 +65,23 @@ class UserController extends Controller
 		$input = $request->all();
 
 		$persona = User::find($input["id"]);
-		
+
 		$persona->nombres = $input["nombres"];
 		$persona->apellidos = $input["apellidos"];
 		$persona->telefono1 = $input["telefono1"];
 		$persona->telefono2 = $input["telefono2"];
 		$persona->login = $input["login"];
-		$persona->email = $input["email"];
-		$persona->username = $input["username"];
-		$persona->password = $input["password"];
+		if ($input["login"]) {
+			$persona->email = $input["email"];
+			$persona->username = $input["username"];
+			$persona->password = $input["password"];
+		} else {
+			$persona->ruta = $input["ruta"];
+		}
 
 		$persona->save();
 		$personas = User::get();
 
 		return response()->json(['data' => $personas]);
 	}
-
-	
 }

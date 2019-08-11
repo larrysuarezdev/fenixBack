@@ -11,7 +11,12 @@ class User extends Authenticatable
 	protected $primaryKey = 'id';
 
 	protected $casts = [
-		'login' => 'bool'
+		'login' => 'bool',
+		'ruta' => 'int'
+	];
+
+	protected $hidden = [
+		'password'
 	];
 
 	protected $fillable = [
@@ -20,9 +25,10 @@ class User extends Authenticatable
 		'telefono1',
 		'telefono2',
 		'login',
-		'email',
 		'username',
-		'password'
+		'password',
+		'ruta',
+		'email'
 	];
 
 	public function creditos_detalles()

@@ -1,8 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Cliente;
+
+// use App\Cliente;
 use Carbon\Carbon;
+use DB;
+
+
 // use Illuminate\Http\Request;
 // use App\Http\Requests;
 
@@ -12,10 +16,20 @@ class DashboardController extends Controller
     {
         $ageFrom = Carbon::now()->startOfMonth();
         $ageTo   = Carbon::now()->endOfMonth();
+        $cantNew = 0;
+        $cantRen = 0;
 
-        error_log($ageFrom);
-        error_log($ageTo);
-        $clientesNew = Cliente::whereBetween('created_at', [$ageFrom, $ageTo])->get()->count();
-        return response()->json(['clientesNew' => $clientesNew]);
+        $clientesNew = DB::select('call sp_getnewclientsmonth(?,?)', array($ageFrom, $ageTo));
+        $clientesRen = DB::select('call sp_getrenovacionmonth(?,?)', array($ageFrom, $ageTo));
+
+        foreach ($clientesNew  as $key => $value) {
+            $cantNew = $cantNew + $value->value;
+        }
+
+        foreach ($clientesRen  as $key => $value) {
+            $cantRen = $cantRen + $value->value;
+        }
+
+        return response()->json(['clientesNew' => $clientesNew, 'cantNew' => $cantNew, 'clientesRen' => $clientesRen, 'cantRen' => $cantRen ]);
     }
 }

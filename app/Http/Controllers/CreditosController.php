@@ -11,14 +11,16 @@ use Carbon\Carbon;
 use JWTAuth;
 use DB;
 use App\FlujoCaja;
+use App\User;
 
 class CreditosController extends Controller
 {
     public function getCredito($id)
     {
         $creditos = Credito::getCreditos($id);
+        $cobrador = User::where([['ruta', $id], ['login', false]])->first();
 
-        return response()->json(['data' => $creditos]);
+        return response()->json(['data' => $creditos, 'cobrador' => $cobrador ]);
     }
 
     public function postCredito(Requests\addCreditoRequest $request)
@@ -49,7 +51,9 @@ class CreditosController extends Controller
 
         $creditos = Credito::getCreditos($input['ruta_id']);
 
-        return response()->json(['data' => $creditos]);
+        $cobrador = User::where([['ruta', $input['ruta_id']], ['login', false]])->first();
+
+        return response()->json(['data' => $creditos, 'cobrador' => $cobrador ]);
     }
 
     public function postAbonos(Requests\addCuotasRequest $request)
@@ -112,7 +116,9 @@ class CreditosController extends Controller
 
         $creditos = Credito::getCreditos($input['idRuta']);
 
-        return response()->json(['data' => $creditos]);
+        $cobrador = User::where([['ruta', $input['idRuta']], ['login', false]])->first();
+
+        return response()->json(['data' => $creditos, 'cobrador' => $cobrador ]);
     }
 
     public function postRenovaciones(Requests\RenovacionesRequest $request)
