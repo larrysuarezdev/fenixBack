@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\User;
+use App\ParametrosDetalle;
+use App\RolesPermiso;
 use JWTAuth;
 use Hash as Hash;
 
@@ -19,12 +21,16 @@ class UserController extends Controller
 		];
 
 		$user = User::where('Username', $credentials['Username'])->first();
+		$rol = ParametrosDetalle::where([['parametro_id', 1], ['id_interno', $user->rol ]])->first();
+		// var_dump($rol);
 
+		$rolesPermiso = RolesPermiso::where([['rol_id', $rol->id_interno], ['ver', true]])->get();
+		
 		if ($user) {
 			$hashed = Hash::make($credentials['Password']);
 			if (Hash::check($user->password, $hashed)) {
 				$token = JWTAuth::fromUser($user);
-				return response()->json(['token' => $token, 'user' => $user]);
+				return response()->json(['token' => $token, 'user' => $user, 'rol' => $rolesPermiso]);
 			}
 		}
 
@@ -53,6 +59,7 @@ class UserController extends Controller
 		$persona->username = $input["username"];
 		$persona->password = $input["password"];
 		$persona->ruta = $input["ruta"];
+		$persona->rol = $input["rol"];
 
 		$persona->save();
 		$personas = User::get();
@@ -74,7 +81,10 @@ class UserController extends Controller
 		if ($input["login"]) {
 			$persona->email = $input["email"];
 			$persona->username = $input["username"];
-			$persona->password = $input["password"];
+			$persona->rol = $input["rol"];
+			if ($request->has('password')) {
+				$persona->password = $input["password"];				
+			} 
 		} else {
 			$persona->ruta = $input["ruta"];
 		}

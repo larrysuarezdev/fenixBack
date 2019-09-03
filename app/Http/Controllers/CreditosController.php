@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use JWTAuth;
 use DB;
 use App\FlujoCaja;
+use App\FlujoUtilidade;
 use App\User;
 
 class CreditosController extends Controller
@@ -20,7 +21,7 @@ class CreditosController extends Controller
         $creditos = Credito::getCreditos($id);
         $cobrador = User::where([['ruta', $id], ['login', false]])->first();
 
-        return response()->json(['data' => $creditos, 'cobrador' => $cobrador ]);
+        return response()->json(['data' => $creditos, 'cobrador' => $cobrador]);
     }
 
     public function postCredito(Requests\addCreditoRequest $request)
@@ -53,7 +54,7 @@ class CreditosController extends Controller
 
         $cobrador = User::where([['ruta', $input['ruta_id']], ['login', false]])->first();
 
-        return response()->json(['data' => $creditos, 'cobrador' => $cobrador ]);
+        return response()->json(['data' => $creditos, 'cobrador' => $cobrador]);
     }
 
     public function postAbonos(Requests\addCuotasRequest $request)
@@ -62,7 +63,8 @@ class CreditosController extends Controller
         $input = $request->all();
 
         DB::beginTransaction();
-
+        $utilidad = 0;
+        // $orden = 0;
         foreach ($input['cuotas'] as $key => $value) {
             if ($value['cuota'] != null) {
                 $creditoDetalle = new CreditosDetalle();
@@ -72,12 +74,22 @@ class CreditosController extends Controller
                 $creditoDetalle->usuario_id = $user->id;
                 $creditoDetalle->save();
             }
+            
             $credito = Credito::find($value['id']);
-            $credito->orden = $value['orden'];
+            $estado = Credito::ChangeStateCredito($value['id']);
+            $credito->activo = $estado;
+            if (!$estado) {
+                $credito->orden = null;
+                $utilidad = $utilidad + (($credito->mod_cuota * $credito->mod_dias) - $credito->valor_prestamo);
+            } else {
+                $credito->orden = $value['orden'];
+            }
             $credito->save();
         }
 
         foreach ($input['renovaciones'] as $key => $value) {
+
+            CreditosRenovacione::ChangeStateRenovacion($value['id']);
             $renovacion = new CreditosRenovacione();
             $renovacion->credito_id = $value['id'];
             $renovacion->excedente = $value['excedente'];
@@ -98,19 +110,49 @@ class CreditosController extends Controller
             }
         }
 
-        $flujo = new FlujoCaja();
-        $flujo->descripcion = "Entrada en ruta " . $input['idRuta'];
-        $flujo->tipo = 1;
-        $flujo->valor = $input['flujoCaja']['entrada'];
-        $flujo->fecha = Carbon::now();
-        $flujo->save();
+        // $creditosCh = Credito::getCreditos($input['idRuta']);
 
-        $flujo = new FlujoCaja();
-        $flujo->descripcion = "Salida en ruta " . $input['idRuta'];
-        $flujo->tipo = 2;
-        $flujo->valor = $input['flujoCaja']['salida'];
-        $flujo->fecha = Carbon::now();
-        $flujo->save();
+        // for ($i = 0; $i < count($creditosCh); $i++) {
+        //     $creditoE = Credito::find($creditosCh[$i]->id);
+        //     $creditoE->orden = $i + 1;
+        //     $creditoE->save();
+        // }
+
+        if ($input['flujoCaja']['entrada'] > 0) {
+            $flujo = new FlujoCaja();
+            $flujo->descripcion = "Entrada en ruta " . $input['idRuta'];
+            $flujo->tipo = 1;
+            $flujo->valor = $input['flujoCaja']['entrada'];
+            $flujo->fecha = Carbon::now();
+            $flujo->save();
+        }
+
+        if ($input['flujoCaja']['salida'] > 0) {
+            $flujo = new FlujoCaja();
+            $flujo->descripcion = "Salida en ruta " . $input['idRuta'];
+            $flujo->tipo = 2;
+            $flujo->valor = $input['flujoCaja']['salida'];
+            $flujo->fecha = Carbon::now();
+            $flujo->save();
+        }
+
+        if ($input['flujoCaja']['utilidad'] > 0) {
+            $flujoUtilidad = new FlujoUtilidade();
+            $flujoUtilidad->descripcion = "Entrada en ruta " . $input['idRuta'];
+            $flujoUtilidad->valor = $input['flujoCaja']['utilidad'];
+            $flujoUtilidad->fecha = Carbon::now();
+            $flujoUtilidad->tipo = 2;
+            $flujoUtilidad->save();
+        }
+
+        if ($utilidad > 0) {
+            $flujoUtilidad = new FlujoUtilidade();
+            $flujoUtilidad->descripcion = "Utilidad ganada en ruta " . $input['idRuta'] . "";
+            $flujoUtilidad->valor = $utilidad;
+            $flujoUtilidad->fecha = Carbon::now();
+            $flujoUtilidad->tipo = 2;
+            $flujoUtilidad->save();
+        }
 
         DB::commit();
 
@@ -118,14 +160,16 @@ class CreditosController extends Controller
 
         $cobrador = User::where([['ruta', $input['idRuta']], ['login', false]])->first();
 
-        return response()->json(['data' => $creditos, 'cobrador' => $cobrador ]);
+        return response()->json(['data' => $creditos, 'cobrador' => $cobrador]);
     }
 
     public function postRenovaciones(Requests\RenovacionesRequest $request)
     {
         $input = $request->all();
 
-        $credito = Credito::with('creditos_detalles')->where('id', $input['id'])->get();
+        $credito = Credito::with(['creditos_detalles' => function ($v) {
+            $v->where('estado', true);
+        }])->where('id', $input['id'])->get();
 
         $valor_total = $credito[0]->mod_cuota * $credito[0]->mod_dias;
         $interes = $valor_total - $credito[0]->valor_prestamo;
@@ -136,12 +180,6 @@ class CreditosController extends Controller
         } else {
             return response()->json(['Error' => "El crédito no cumple con los requisitos minímos para renovar"], 424);
         }
-
-        // DB::commit();
-
-        // $creditos = Credito::getCreditos($input['1']);
-
-        // return response()->json(['data' => $credito]);
     }
 
     public function getClientes()

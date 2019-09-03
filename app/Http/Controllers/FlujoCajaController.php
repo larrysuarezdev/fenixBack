@@ -12,7 +12,7 @@ class FlujoCajaController extends Controller
     
     public function getFlujoCaja()
     {
-        $flujoCaja = FlujoCaja::get();
+        $flujoCaja = FlujoCaja::orderBy('fecha', 'desc')->get();
 
         return response()->json(['data' => $flujoCaja]);
     }

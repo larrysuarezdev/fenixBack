@@ -16,7 +16,7 @@ class Credito extends Eloquent
 		'cuotas_pagas' => 'float',
 		'valor_prestamo' => 'float',
 		'mod_cuota' => 'float',
-		'modalidad' => 'bool',
+		'modalidad' => 'int',
 		'activo' => 'bool'
 	];
 
@@ -61,7 +61,9 @@ class Credito extends Eloquent
 			->with(['creditos_detalles' => function ($v) {
 				$v->where('estado', true);
 			}])
-			->with('creditos_renovaciones')
+			->with(['creditos_renovaciones' => function ($c) {
+				$c->where('estado', true);
+			}])
 			->where([['ruta_id', $id], ['activo', true]])->orderBy('orden', 'ASC')
 			->get();
 
@@ -75,6 +77,24 @@ class Credito extends Eloquent
 		if (count($creditos) > 0)
 			$res = true;
 
+		return $res;
+	}
+
+	public static function ChangeStateCredito($id)
+	{
+		$res = true;
+		$credito = Credito::with(['creditos_detalles' => function ($v) {
+			$v->where('estado', true);
+		}])
+			->where([['id', $id], ['activo', true]])->orderBy('orden', 'ASC')
+			->get();
+
+		$valor_total = $credito[0]->mod_cuota * $credito[0]->mod_dias;
+		$total_pago_fecha = $credito[0]->creditos_detalles->sum('abono');
+
+		if ($valor_total == $total_pago_fecha) {
+			$res = false;
+		}		
 		return $res;
 	}
 }

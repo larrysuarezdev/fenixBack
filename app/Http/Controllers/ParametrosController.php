@@ -40,7 +40,24 @@ class ParametrosController extends Controller
 
     public function getPeriodos()
     {
-        $parametros = Parametro::with('parametros_detalles')->where('nombre', 'Intervalos')->get();
+        $parametros = Parametro::with('parametros_detalles')->where('nombre', 'Modos de pago')->get();
+
+        $rutas = array();
+        foreach ($parametros as $key => $value) {
+            foreach ($value->parametros_detalles as $key1 => $valueP) {
+                $rutas[] = array(
+                    'value' => $valueP['id_interno'],
+                    'label' => $valueP['valor']
+                );
+            }
+        }
+
+        return response()->json(['data' => $rutas]);
+    }
+
+    public function getRoles()
+    {
+        $parametros = Parametro::with('parametros_detalles')->where('nombre', 'Roles')->get();
 
         $rutas = array();
         foreach ($parametros as $key => $value) {

@@ -12,7 +12,8 @@ class User extends Authenticatable
 
 	protected $casts = [
 		'login' => 'bool',
-		'ruta' => 'int'
+		'ruta' => 'int',
+		'rol' => 'int'
 	];
 
 	protected $hidden = [
@@ -28,6 +29,7 @@ class User extends Authenticatable
 		'username',
 		'password',
 		'ruta',
+		'rol',
 		'email'
 	];
 

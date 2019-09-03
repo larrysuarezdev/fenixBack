@@ -26,4 +26,13 @@ class CreditosRenovacione extends Eloquent
 	{
 		return $this->belongsTo(\App\Credito::class);
 	}
+
+	public static function ChangeStateRenovacion($id)
+	{		
+		$renovaciones = CreditosRenovacione::where([['credito_id', $id], ['estado', true]])->get();
+		foreach ($renovaciones as $key => $value) {
+			$value->estado = false;
+			$value->save();
+		}
+	}
 }

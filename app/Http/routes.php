@@ -15,6 +15,11 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
             Route::get('/newclientes', 'DashboardController@getNewClientes');            
         });
 
+        Route::group(['prefix' => 'roles'], function() {
+            Route::get('/{id}', 'RolesController@getPermisoByRol');            
+            Route::put('/', 'RolesController@putPermisos');            
+        });
+
         Route::group(['prefix' => 'usuarios'], function() {
             Route::get('/', 'UserController@getUsers');
             Route::post('/', 'UserController@saveUser');
@@ -32,6 +37,7 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
             Route::get('/', 'ParametrosController@getParametros');
             Route::get('/rutas', 'ParametrosController@getRutas');
             Route::get('/periodos', 'ParametrosController@getPeriodos');
+            Route::get('/roles', 'ParametrosController@getRoles');
             Route::post('/', 'ParametrosController@postParametros');
             Route::put('/', 'ParametrosController@putParametros');
         });
@@ -47,7 +53,11 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
         Route::group(['prefix' => 'flujoCaja'], function() {
             Route::get('/', 'FlujoCajaController@getFlujoCaja');
             Route::post('/', 'FlujoCajaController@postSaveFlujo');
-            // Route::put('/estado/{id}', 'FlujoCajaController@putEstadoRutas');
+        });
+
+        Route::group(['prefix' => 'flujoUtilidades'], function() {
+            Route::get('/', 'flujoUtilidadesController@getflujoUtilidades');
+            Route::post('/', 'flujoUtilidadesController@postSaveFlujo');
         });
 
         
