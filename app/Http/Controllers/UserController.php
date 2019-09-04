@@ -94,4 +94,13 @@ class UserController extends Controller
 
 		return response()->json(['data' => $personas]);
 	}
+
+	public function changePassword(Requests\PasswordResetRequest $request)
+	{
+		$input = $request->all();
+
+		$persona = User::find($input["userId"]);
+		$persona->password = $input["password"];
+		$persona->save();
+	}
 }

@@ -23,6 +23,8 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
         Route::group(['prefix' => 'usuarios'], function() {
             Route::get('/', 'UserController@getUsers');
             Route::post('/', 'UserController@saveUser');
+            Route::post('/changePassword', 'UserController@changePassword');
+            Route::put('/', 'UserController@updateUser');
             Route::put('/', 'UserController@updateUser');
         });
 
@@ -47,18 +49,22 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
             Route::get('/{id}', 'CreditosController@getCredito');
             Route::post('/', 'CreditosController@postCredito');
             Route::post('/abonos', 'CreditosController@postAbonos');
+            Route::post('/reorder', 'CreditosController@postSetEstadosCreditos');
             Route::post('/renovaciones', 'CreditosController@postRenovaciones');
         });
 
         Route::group(['prefix' => 'flujoCaja'], function() {
             Route::get('/', 'FlujoCajaController@getFlujoCaja');
+            Route::get('/utilidades', 'FlujoCajaController@getFlujoUtilidades');
             Route::post('/', 'FlujoCajaController@postSaveFlujo');
+            Route::post('/utilidades', 'FlujoCajaController@postSaveFlujoUtilidades');
+
         });
 
-        Route::group(['prefix' => 'flujoUtilidades'], function() {
-            Route::get('/', 'flujoUtilidadesController@getflujoUtilidades');
-            Route::post('/', 'flujoUtilidadesController@postSaveFlujo');
-        });
+        // Route::group(['prefix' => 'flujoUtilidades'], function() {
+        //     // Route::get('/', 'flujoUtilidadesController@getFlujoUtilidades');
+        //     Route::post('/', 'flujoUtilidadesController@postSaveFlujo');
+        // });
 
         
         // Route::group(['prefix' => 'viajes'], function() {

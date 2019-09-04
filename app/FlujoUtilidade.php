@@ -7,8 +7,8 @@ use Reliese\Database\Eloquent\Model as Eloquent;
 class FlujoUtilidade extends Eloquent
 {
 	protected $casts = [
-		'tipo' => 'int',
-		'valor' => 'float'
+		'valor' => 'float',
+		'tipo' => 'int'
 	];
 
 	protected $dates = [
@@ -17,8 +17,8 @@ class FlujoUtilidade extends Eloquent
 
 	protected $fillable = [
 		'descripcion',
-		'tipo',
 		'valor',
+		'tipo',
 		'fecha'
 	];
 }

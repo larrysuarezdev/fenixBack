@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
+
 use App\Http\Requests;
 use App\FlujoUtilidade;
 
@@ -9,9 +9,12 @@ class FlujoUtilidadesController extends Controller
 {
     public function getFlujoUtilidades()
     {
-        $flujoCaja = FlujoUtilidade::get();
-
-        return response()->json(['data' => $flujoCaja]);
+        try {
+            $flujoCaja = FlujoUtilidade::get();
+            return response()->json(['data' => $flujoCaja]);
+        } catch (Exception $e) {
+            return response()->json(['Error' => $e], 423);
+        }
     }
 
     public function postSaveFlujo(Requests\FlujoUtilidadesRequest $request)
