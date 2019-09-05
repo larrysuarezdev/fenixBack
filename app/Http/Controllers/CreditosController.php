@@ -63,6 +63,8 @@ class CreditosController extends Controller
         $input = $request->all();
 
         DB::beginTransaction();
+        $utilidad = 0;
+        $orden = 1;
         foreach ($input['cuotas'] as $key => $value) {
             if ($value['cuota'] != null) {
                 $creditoDetalle = new CreditosDetalle();
@@ -72,6 +74,33 @@ class CreditosController extends Controller
                 $creditoDetalle->usuario_id = $user->id;
                 $creditoDetalle->save();
             }
+
+            $credito = Credito::with(['creditos_detalles' => function ($v) {
+                $v->where('estado', true);
+            }])
+                ->where([['id', $value['id']], ['activo', true]])->orderBy('orden', 'ASC')
+                ->get();
+            // var_dump($credito);
+            $estado = true;
+
+            $valor_total = $credito[0]->mod_cuota * $credito[0]->mod_dias;
+            $total_pago_fecha = $credito[0]->creditos_detalles->sum('abono');
+
+            if ($valor_total == $total_pago_fecha) {
+                $estado = false;
+            }
+
+            $credito[0]->activo = $estado;
+
+            if (!$estado) {
+                $credito[0]->orden = null;
+                $utilidad = $utilidad + (($credito[0]->mod_cuota * $credito[0]->mod_dias) - $credito[0]->valor_prestamo);
+            } else {
+                $credito[0]->orden = $orden;
+                $orden = $orden + 1;
+            }
+
+            $credito[0]->save();
         }
 
         foreach ($input['renovaciones'] as $key => $value) {
@@ -121,49 +150,8 @@ class CreditosController extends Controller
 
         if ($input['flujoCaja']['utilidad'] > 0) {
             $flujoUtilidad = new FlujoUtilidade();
-            $flujoUtilidad->descripcion = "Entrada en ruta " . $input['idRuta'];
+            $flujoUtilidad->descripcion = "Utilidad ruta " . $input['idRuta'];
             $flujoUtilidad->valor = $input['flujoCaja']['utilidad'];
-            $flujoUtilidad->fecha = Carbon::now();
-            $flujoUtilidad->tipo = 1;
-            $flujoUtilidad->save();
-        }
-
-        DB::commit();
-
-        return response()->json(['data' => true]);
-    }
-
-    public function postSetEstadosCreditos(Requests\ReorderRequest $request)
-    {
-        $input = $request->all();
-
-        DB::beginTransaction();
-        // var_dump($input['data']);
-
-        $credito = Credito::whereIn('id', $input['data'])->get();
-        // var_dump($credito);
-
-        $utilidad = 0;
-        $orden = 1;
-        foreach ($credito as $key => $value) {
-            $estado = Credito::ChangeStateCredito($value->id);
-            $value->activo = $estado;
-
-            if (!$estado) {
-                $value->orden = null;
-                $utilidad = $utilidad + (($value->mod_cuota * $value->mod_dias) - $value->valor_prestamo);
-            } else {
-                $value->orden = $orden;
-                $orden = $orden + 1;
-            }
-
-            $value->save();
-        }
-
-        if ($utilidad > 0) {
-            $flujoUtilidad = new FlujoUtilidade();
-            $flujoUtilidad->descripcion = "Utilidad ganada en ruta " . $input['idRuta'] . "";
-            $flujoUtilidad->valor = $utilidad;
             $flujoUtilidad->fecha = Carbon::now();
             $flujoUtilidad->tipo = 1;
             $flujoUtilidad->save();
@@ -176,6 +164,50 @@ class CreditosController extends Controller
 
         return response()->json(['data' => $creditos, 'cobrador' => $cobrador]);
     }
+
+    // public function postSetEstadosCreditos(Requests\ReorderRequest $request)
+    // {
+    //     $input = $request->all();
+
+    //     DB::beginTransaction();
+    //     // var_dump($input['data']);
+
+    //     $credito = Credito::whereIn('id', $input['data'])->get();
+    //     // var_dump($credito);
+
+    //     $utilidad = 0;
+    //     $orden = 1;
+    //     foreach ($credito as $key => $value) {
+    //         $estado = Credito::ChangeStateCredito($value->id);
+    //         $value->activo = $estado;
+
+    //         if (!$estado) {
+    //             $value->orden = null;
+    //             $utilidad = $utilidad + (($value->mod_cuota * $value->mod_dias) - $value->valor_prestamo);
+    //         } else {
+    //             $value->orden = $orden;
+    //             $orden = $orden + 1;
+    //         }
+
+    //         $value->save();
+    //     }
+
+    //     if ($utilidad > 0) {
+    //         $flujoUtilidad = new FlujoUtilidade();
+    //         $flujoUtilidad->descripcion = "Utilidad ruta " . $input['idRuta'] . "";
+    //         $flujoUtilidad->valor = $utilidad;
+    //         $flujoUtilidad->fecha = Carbon::now();
+    //         $flujoUtilidad->tipo = 1;
+    //         $flujoUtilidad->save();
+    //     }
+
+    //     DB::commit();
+
+    //     $creditos = Credito::getCreditos($input['idRuta']);
+    //     $cobrador = User::where([['ruta', $input['idRuta']], ['login', false]])->first();
+
+    //     return response()->json(['data' => $creditos, 'cobrador' => $cobrador]);
+    // }
 
     public function postRenovaciones(Requests\RenovacionesRequest $request)
     {
