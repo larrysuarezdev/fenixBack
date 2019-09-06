@@ -16,7 +16,7 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
         });
 
         Route::group(['prefix' => 'roles'], function() {
-            Route::get('/{id}', 'RolesController@getPermisoByRol');            
+            Route::get('/{id}', 'RolesController@getPermisoByRol');   
             Route::put('/', 'RolesController@putPermisos');            
         });
 

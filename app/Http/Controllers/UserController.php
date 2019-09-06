@@ -48,18 +48,22 @@ class UserController extends Controller
 	public function saveUser(Requests\UserRequest $request)
 	{
 		$input = $request->all();
-
 		$persona = new User;
 		$persona->nombres = $input["nombres"];
 		$persona->apellidos = $input["apellidos"];
 		$persona->telefono1 = $input["telefono1"];
 		$persona->telefono2 = $input["telefono2"];
 		$persona->login = $input["login"];
-		$persona->email = $input["email"];
-		$persona->username = $input["username"];
-		$persona->password = $input["password"];
-		$persona->ruta = $input["ruta"];
-		$persona->rol = $input["rol"];
+		if ($input["login"]) {
+			$persona->email = $input["email"];
+			$persona->username = $input["username"];
+			$persona->rol = $input["rol"];
+			if ($request->has('password')) {
+				$persona->password = $input["password"];				
+			} 
+		} else {
+			$persona->ruta = $input["ruta"];
+		}
 
 		$persona->save();
 		$personas = User::get();
