@@ -17,7 +17,8 @@ class Credito extends Eloquent
 		'valor_prestamo' => 'float',
 		'mod_cuota' => 'float',
 		'modalidad' => 'int',
-		'activo' => 'bool'
+		'activo' => 'bool',
+		'eliminado' => 'bool'
 	];
 
 	protected $dates = [
@@ -36,6 +37,7 @@ class Credito extends Eloquent
 		'observaciones',
 		'modalidad',
 		'activo',
+		'eliminado',
 		'inicio_credito'
 	];
 

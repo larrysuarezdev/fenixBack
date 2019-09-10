@@ -65,6 +65,15 @@ class CreditosController extends Controller
         DB::beginTransaction();
         $utilidad = 0;
         $orden = 1;
+
+        foreach ($input['eliminar'] as $key => $value) {
+            $credito = Credito::find($value['id']);
+            $credito->activo = false;
+            $credito->orden = null;
+            $credito->eliminado = true;
+            $credito->save();
+        }
+
         foreach ($input['cuotas'] as $key => $value) {
             if ($value['cuota'] != null) {
                 $creditoDetalle = new CreditosDetalle();
@@ -148,7 +157,9 @@ class CreditosController extends Controller
             $flujo->save();
         }
 
-        if ($input['flujoCaja']['utilidad'] > 0) {
+        $sumUtilidad = $input['flujoCaja']['utilidad'] + $utilidad;
+
+        if ($sumUtilidad > 0 ) {
             $flujoUtilidad = new FlujoUtilidade();
             $flujoUtilidad->descripcion = "Utilidad ruta " . $input['idRuta'];
             $flujoUtilidad->valor = $input['flujoCaja']['utilidad'];
