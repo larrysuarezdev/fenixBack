@@ -89,7 +89,6 @@ class CreditosController extends Controller
             }])
                 ->where([['id', $value['id']], ['activo', true]])->orderBy('orden', 'ASC')
                 ->get();
-            // var_dump($credito);
             $estado = true;
 
             $valor_total = $credito[0]->mod_cuota * $credito[0]->mod_dias;
@@ -103,7 +102,8 @@ class CreditosController extends Controller
 
             if (!$estado) {
                 $credito[0]->orden = null;
-                $utilidad = $utilidad + (($credito[0]->mod_cuota * $credito[0]->mod_dias) - $credito[0]->valor_prestamo);
+                $sum = ($credito[0]->mod_cuota * $credito[0]->mod_dias) - $credito[0]->valor_prestamo;
+                $utilidad = $utilidad + $sum;
             } else {
                 $credito[0]->orden = $orden;
                 $orden = $orden + 1;
@@ -162,7 +162,7 @@ class CreditosController extends Controller
         if ($sumUtilidad > 0 ) {
             $flujoUtilidad = new FlujoUtilidade();
             $flujoUtilidad->descripcion = "Utilidad ruta " . $input['idRuta'];
-            $flujoUtilidad->valor = $input['flujoCaja']['utilidad'];
+            $flujoUtilidad->valor = $sumUtilidad;
             $flujoUtilidad->fecha = Carbon::now();
             $flujoUtilidad->tipo = 1;
             $flujoUtilidad->save();
