@@ -33,6 +33,11 @@ class User extends Authenticatable
 		'email'
 	];
 
+	public function coteos()
+	{
+		return $this->hasMany(\App\Coteo::class, 'id_usuario');
+	}
+
 	public function creditos_detalles()
 	{
 		return $this->hasMany(\App\CreditosDetalle::class, 'usuario_id');

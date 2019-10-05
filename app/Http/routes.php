@@ -16,7 +16,7 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
         });
 
         Route::group(['prefix' => 'roles'], function() {
-            Route::get('/{id}', 'RolesController@getPermisoByRol');            
+            Route::get('/{id}', 'RolesController@getPermisoByRol');   
             Route::put('/', 'RolesController@putPermisos');            
         });
 
@@ -61,10 +61,10 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
 
         });
 
-        // Route::group(['prefix' => 'flujoUtilidades'], function() {
-        //     // Route::get('/', 'flujoUtilidadesController@getFlujoUtilidades');
-        //     Route::post('/', 'flujoUtilidadesController@postSaveFlujo');
-        // });
+        Route::group(['prefix' => 'reportes'], function() {
+            Route::get('/coteos', 'ReportesController@getCoteos');
+            // Route::post('/', 'flujoUtilidadesController@postSaveFlujo');
+        });
 
         
         // Route::group(['prefix' => 'viajes'], function() {

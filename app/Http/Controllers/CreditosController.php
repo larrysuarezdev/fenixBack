@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests;
 use App\Credito;
 use App\Cliente;
+use App\Coteo;
 use App\CreditosDetalle;
 use App\CreditosRenovacione;
 use Carbon\Carbon;
@@ -65,6 +66,15 @@ class CreditosController extends Controller
         DB::beginTransaction();
         $utilidad = 0;
         $orden = 1;
+
+        foreach ($input['eliminar'] as $key => $value) {
+            $credito = Credito::find($value['id']);
+            $credito->activo = false;
+            $credito->orden = null;
+            $credito->eliminado = true;
+            $credito->save();
+        }
+
         foreach ($input['cuotas'] as $key => $value) {
             if ($value['cuota'] != null) {
                 $creditoDetalle = new CreditosDetalle();
@@ -80,7 +90,7 @@ class CreditosController extends Controller
             }])
                 ->where([['id', $value['id']], ['activo', true]])->orderBy('orden', 'ASC')
                 ->get();
-            // var_dump($credito);
+
             $estado = true;
 
             $valor_total = $credito[0]->mod_cuota * $credito[0]->mod_dias;
@@ -93,12 +103,20 @@ class CreditosController extends Controller
             $credito[0]->activo = $estado;
 
             if (!$estado) {
+                $credito[0]->mora = 0;
                 $credito[0]->orden = null;
-                $utilidad = $utilidad + (($credito[0]->mod_cuota * $credito[0]->mod_dias) - $credito[0]->valor_prestamo);
+                $sum = ($credito[0]->mod_cuota * $credito[0]->mod_dias) - $credito[0]->valor_prestamo;
+                $utilidad = $utilidad + $sum;
             } else {
                 $credito[0]->orden = $orden;
                 $orden = $orden + 1;
             }
+
+            if ($value['cuota'] == null)
+                $credito[0]->mora = $credito[0]->mora + 1;
+            else {
+                $credito[0]->mora = $credito[0]->mora == 0 ? 0 : $credito[0]->mora - 1;
+             }
 
             $credito[0]->save();
         }
@@ -120,6 +138,7 @@ class CreditosController extends Controller
             $credito->mod_dias = $value['dias'];
             $credito->mod_cuota = $value['cuota'];
             $credito->valor_prestamo = $value['valor_prestamo'];
+            $credito->mora = 0;
             $credito->save();
 
             $creditoDetalle = CreditosDetalle::where([['credito_id', $value['id'], ['estado', true]]])->get();
@@ -148,13 +167,29 @@ class CreditosController extends Controller
             $flujo->save();
         }
 
-        if ($input['flujoCaja']['utilidad'] > 0) {
+        $sumUtilidad = $input['flujoCaja']['utilidad'] + $utilidad;
+
+        if ($sumUtilidad > 0) {
             $flujoUtilidad = new FlujoUtilidade();
             $flujoUtilidad->descripcion = "Utilidad ruta " . $input['idRuta'];
-            $flujoUtilidad->valor = $input['flujoCaja']['utilidad'];
+            $flujoUtilidad->valor = $sumUtilidad;
             $flujoUtilidad->fecha = Carbon::now();
             $flujoUtilidad->tipo = 1;
             $flujoUtilidad->save();
+        }
+
+        if ($input['flujoCaja']['coteos'] > 0) {
+            $coteos = new Coteo();
+            $coteos->coteos_dia = $input['flujoCaja']['coteos'];
+            $coteos->id_ruta = $input['idRuta'];
+            $coteos->fecha = Carbon::now()->toDateString();
+            $coteos->total_creditos_dia = Credito::where([['ruta_id', $input['idRuta']], ['activo', true], ['modalidad', 1]])->count();
+            $coteos->total_creditos_sem = Credito::where([['ruta_id', $input['idRuta']], ['activo', true], ['modalidad', 2]])->count();
+
+            $user = DB::table('users')->select(DB::raw('id'))->where([['ruta', $input['idRuta']], ['login', false]])->first();
+
+            $coteos->id_usuario = $user->id;
+            $coteos->save();
         }
 
         DB::commit();

@@ -15,9 +15,10 @@ class addCuotasRequest extends Request
     public function rules()
     {
         return [
-            'cuotas' => 'required',
+            'cuotas' => '',
             'idRuta' => 'required',
             'renovaciones' => '',
+            'eliminados' => '',
             'flujoCaja' => 'required'
         ];
     }
