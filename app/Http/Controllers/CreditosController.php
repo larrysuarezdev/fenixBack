@@ -90,7 +90,6 @@ class CreditosController extends Controller
             }])
                 ->where([['id', $value['id']], ['activo', true]])->orderBy('orden', 'ASC')
                 ->get();
-
             $estado = true;
 
             $valor_total = $credito[0]->mod_cuota * $credito[0]->mod_dias;
