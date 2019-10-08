@@ -16,6 +16,7 @@ class addCuotasRequest extends Request
     {
         return [
             'cuotas' => '',
+            'calculoMoras' => '',
             'idRuta' => 'required',
             'renovaciones' => '',
             'eliminados' => '',

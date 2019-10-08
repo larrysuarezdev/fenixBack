@@ -64,7 +64,7 @@ class Credito extends Eloquent
 				$v->where('estado', true);
 			}])
 			->with(['creditos_renovaciones' => function ($c) {
-				$c->where('estado', true);
+				// $c->where('estado', true);
 			}])
 			->where([['ruta_id', $id], ['activo', true]])->orderBy('orden', 'ASC')
 			->get();

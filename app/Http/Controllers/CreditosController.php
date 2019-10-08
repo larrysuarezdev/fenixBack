@@ -109,13 +109,30 @@ class CreditosController extends Controller
             } else {
                 $credito[0]->orden = $orden;
                 $orden = $orden + 1;
-            }
 
-            if ($value['cuota'] == null)
-                $credito[0]->mora = $credito[0]->mora + 1;
-            else {
-                $credito[0]->mora = $credito[0]->mora == 0 ? 0 : $credito[0]->mora - 1;
-             }
+                if ($input["calculoMoras"]) {
+                    if ($value['cuota'] == null)
+                        $credito[0]->mora = $credito[0]->mora + 1;
+                    else {
+                        if ($credito[0]->modalidad == 1) {
+                            if ($value['cuota'] < $credito[0]->mod_cuota)
+                                $credito[0]->mora = $credito[0]->mora - 1;
+                            else {
+                                $moraDias = (int) $value['cuota'] / $credito[0]->mod_cuota;
+
+                                // if()
+                                $credito[0]->mora = $credito[0]->mora - $moraDias;
+                            }
+                        } else {
+                            if ($value['cuota'] < $credito[0]->mod_cuota)
+                                $credito[0]->mora = $credito[0]->mora + 1;
+                            else {
+                                $credito[0]->mora = 0;
+                            }
+                        }
+                    }
+                }
+            }
 
             $credito[0]->save();
         }
