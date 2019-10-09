@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\User;
-use App\Credito;
-use DB;
+use App\FlujoUtilidade;
+use App\FlujoCaja;
 
 class ReportesController extends Controller
 {
@@ -15,17 +15,24 @@ class ReportesController extends Controller
         $input = $request->all();
         $FI = $input['fechaIni'];
         $FF = $input['fechaFin'];
-        // var_dump($input);
-        // $v->whereBetween('fecha', [$input['fechaIni'], $input['FechaFin']]);
-        $cobradores = User::
-            // with('coteos')
-            with(['coteos' => function ($query) use ($FI, $FF) {
+
+        $cobradores = User::with(['coteos' => function ($query) use ($FI, $FF) {
                 $query->whereBetween('fecha', [$FI, $FF]);
             }])
             ->where([["login", false]])->orderBy("ruta")->get();
 
+        $utilidades = FlujoUtilidade::where('descripcion', 'like', '%Utilidad ruta %')
+            ->whereBetween('fecha', [$FI, $FF])
+            ->get();
+
+        $recaudos = FlujoCaja::where('descripcion', 'like', '%Cobros ruta %')
+            ->whereBetween('fecha', [$FI, $FF])
+            ->get();
+
         return response()->json([
-            'data' => $cobradores
+            'data' => $cobradores,
+            'utilidades' => $utilidades,
+            'recaudos' => $recaudos,
         ]);
     }
 }

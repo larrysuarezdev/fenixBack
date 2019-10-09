@@ -27,6 +27,7 @@ class Credito extends Eloquent
 
 	protected $fillable = [
 		'orden',
+		'obs_dia',
 		'cliente_id',
 		'ruta_id',
 		'mora',

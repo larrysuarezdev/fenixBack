@@ -99,6 +99,7 @@ class CreditosController extends Controller
                 $estado = false;
             }
 
+            $credito[0]->obs_dia = $value['obs'];
             $credito[0]->activo = $estado;
 
             if (!$estado) {
@@ -116,12 +117,12 @@ class CreditosController extends Controller
                     else {
                         if ($credito[0]->modalidad == 1) {
                             if ($value['cuota'] < $credito[0]->mod_cuota)
-                                $credito[0]->mora = $credito[0]->mora - 1;
+                                $credito[0]->mora = $credito[0]->mora;
                             else {
                                 $moraDias = (int) $value['cuota'] / $credito[0]->mod_cuota;
 
-                                // if()
-                                $credito[0]->mora = $credito[0]->mora - $moraDias;
+                                if ($moraDias >= 2)
+                                    $credito[0]->mora = $credito[0]->mora - ($moraDias - 1);
                             }
                         } else {
                             if ($value['cuota'] < $credito[0]->mod_cuota)

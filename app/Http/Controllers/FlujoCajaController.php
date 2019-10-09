@@ -38,7 +38,7 @@ class FlujoCajaController extends Controller
     public function getFlujoUtilidades()
     {
         try {
-            $FlujoUtilidades = FlujoUtilidade::get();
+            $FlujoUtilidades = FlujoUtilidade::orderBy('fecha', 'desc')->get();
             return response()->json(['data' => $FlujoUtilidades]);
         } catch (Exception $e) {
             return response()->json(['Error' => $e], 423);

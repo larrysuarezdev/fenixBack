@@ -52,7 +52,18 @@ class ParametrosController extends Controller
             }
         }
 
-        return response()->json(['data' => $rutas]);
+        $obs_dias = Parametro::with('parametros_detalles')->where('nombre', 'Modalidades')->get();
+        $dias = array();
+        foreach ($obs_dias as $key => $value) {
+            foreach ($value->parametros_detalles as $key1 => $valueP) {
+                $dias[] = array(
+                    'id' => $valueP['valor'],
+                    'value' => $valueP['valor']
+                );
+            }
+        }
+
+        return response()->json(['data' => $rutas, 'dias' => $dias]);
     }
 
     public function getRoles()
