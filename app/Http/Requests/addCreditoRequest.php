@@ -20,6 +20,7 @@ class addCreditoRequest extends Request
             'valor_prestamo' => 'required',
             'mod_cuota' => 'required',
             'mod_dias' => 'required',
+            'obs_dia' => '',
         ];
     }
 }

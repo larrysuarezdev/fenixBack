@@ -13,9 +13,14 @@ class FlujoCajaController extends Controller
     
     public function getFlujoCaja()
     {
-        $flujoCaja = FlujoCaja::orderBy('fecha', 'desc')->get();
+        $flujoCaja = FlujoCaja::orderBy('fecha', 'desc')->paginate(1000);
+        
 
-        return response()->json(['data' => $flujoCaja]);
+        $entrada = FlujoCaja::where('tipo', 1)->sum('valor');
+        $salidas = FlujoCaja::where('tipo', 2)->sum('valor');
+        $sum = $entrada - $salidas;
+
+        return response()->json(['data' => $flujoCaja, 'sum' => $sum]);
     }
 
     public function postSaveFlujo(Requests\FlujoCajaRequest $request)
@@ -37,12 +42,20 @@ class FlujoCajaController extends Controller
 
     public function getFlujoUtilidades()
     {
-        try {
-            $FlujoUtilidades = FlujoUtilidade::orderBy('fecha', 'desc')->get();
-            return response()->json(['data' => $FlujoUtilidades]);
-        } catch (Exception $e) {
-            return response()->json(['Error' => $e], 423);
-        }
+        $FlujoUtilidades = FlujoUtilidade::orderBy('fecha', 'desc')->paginate(1000);
+        
+
+        $entrada = FlujoUtilidade::where('tipo', 1)->sum('valor');
+        $salidas = FlujoUtilidade::where('tipo', 2)->sum('valor');
+        $sum = $entrada - $salidas;
+
+        return response()->json(['data' => $FlujoUtilidades, 'sum' => $sum]);
+        // try {
+        //     $FlujoUtilidades = FlujoUtilidade::orderBy('fecha', 'desc')->get();
+        //     return response()->json(['data' => $FlujoUtilidades]);
+        // } catch (Exception $e) {
+        //     return response()->json(['Error' => $e], 423);
+        // }
     }
 
     public function postSaveFlujoUtilidades(Requests\FlujoUtilidadesRequest $request)

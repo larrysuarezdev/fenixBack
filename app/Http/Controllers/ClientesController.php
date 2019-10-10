@@ -6,14 +6,14 @@ use App\Http\Requests;
 use App\Cliente;
 use App\Credito;
 use App\ClientesReferencia;
-use JWTAuth;
 
 class ClientesController extends Controller
 {
     public function getClientes()
     {
         $clientes = Cliente::with('clientes_referencias')->with('creditos')->get();
-        return response()->json(['data' => $clientes]);
+        $ca = Credito::where('activo', 1)->count();
+        return response()->json(['data' => $clientes, 'creditosActivos' => $ca]);
     }
 
     public function saveCliente(Requests\ClienteRequest $request)

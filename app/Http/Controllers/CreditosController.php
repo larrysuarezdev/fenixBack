@@ -40,6 +40,7 @@ class CreditosController extends Controller
             $credito->mod_dias = $input['mod_dias'];
             $credito->observaciones = $input['observaciones'];
             $credito->modalidad = $input['modalidad'];
+            $credito->obs_dia = $input['obs_dia'];            
             $credito->save();
 
             $creditos = Credito::getCreditos($input['ruta_id']);
