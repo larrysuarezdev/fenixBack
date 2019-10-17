@@ -69,11 +69,9 @@ class ClientesController extends Controller
             // error_log($value['tipo_referencia']);
             $clienteRef = new ClientesReferencia;
             if (isset($value['new'])) {
-
                 if (!$value['new']) {
                     $clienteRef = ClientesReferencia::find($value["id"]);
                 }
-
                 $clienteRef->cliente_id = $cliente->id;
                 $clienteRef->nombre = $value['nombre'];
                 $clienteRef->direccion = $value['direccion'];

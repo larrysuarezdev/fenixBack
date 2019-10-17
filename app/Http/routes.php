@@ -40,6 +40,7 @@ Route::group(['middleware' => ['api', 'cors'], 'prefix' => 'api'], function () {
             Route::get('/rutas', 'ParametrosController@getRutas');
             Route::get('/periodos', 'ParametrosController@getPeriodos');
             Route::get('/roles', 'ParametrosController@getRoles');
+            Route::get('/fechasReporte', 'ParametrosController@getFechasReporte');
             Route::post('/', 'ParametrosController@postParametros');
             Route::put('/', 'ParametrosController@putParametros');
         });
